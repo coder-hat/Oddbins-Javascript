@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<!--
+2018-1-04
+I created this HTML document as an exercise in learning some basic CSS and Javascript.
+The document dynamically displays the current date a Julian Day calendar.
+The CSS and Javascript elements are embedded inline to keep everything on one physical file.
+I know that's not the preferred style, but this is only an exercise, and it means that I can
+experiment with the code simply by loading file://... into a browser.
+-->
+<head>
+<title>Julian Calendar</title>
+<!--
+StackOverflow:
+How to format text using CSS
+https://stackoverflow.com/questions/3315221/how-to-format-text-using-css
+Snippet taken from ina's answer:
+-->
+<style>
+
+div {
+    background-color: lightblue;
+    width: 100%;
+}
+
+#divDateZone {
+    font-family: "Consolas", Courier, monospace;
+    font-size: 36px;
+    border: 1px solid black;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#divCalendarZone {
+    border: 1px solid black;
+}
+
+table {
+    font-family: "Consolas", Courier, monospace;
+    font-size: 16px;
+    text-align: center;
+    border-collapse: collapse;
+    width: 100%
+}
+
+td {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border: 1px solid white;
+}
+
+[id^="td_"] {
+    padding-left: 3px;
+    padding-right: 3px;
+}
+</style>
+</head>
+
+<body>
+<div id="divDateZone">
+</div>
+<div id="divCalendarZone" style="overflow-x:auto">
+</div>
+
+<script>
+// StackOverflow:
+// Javascript calculate the day of the year (1 - 366)
+// http://stackoverflow.com/questions/8619879/javascript-calculate-the-day-of-the-year-1-366
+// Joe Orost's answer:
+Date.prototype.isLeapYear = function() {
+    var year = this.getFullYear();
+    if((year & 3) != 0) return false;
+    return ((year % 100) != 0 || (year % 400) == 0);
+};
+
+// Get Day of Year
+Date.prototype.getDOY = function() {
+    var dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    var mn = this.getMonth();
+    var dn = this.getDate();
+    var dayOfYear = dayCount[mn] + dn;
+    if(mn > 1 && this.isLeapYear()) dayOfYear++;
+    return dayOfYear;
+};
+
+// StackOverflow:
+// how do I convert an integer to binary in javascript?
+// https://stackoverflow.com/questions/9939760/how-do-i-convert-an-integer-to-binary-in-javascript
+// fernandosavio's answer:
+function dec2binString(decVal) {
+  return (decVal >>> 0).toString(2);
+}
+
+// StackOverflow:
+// What is the best way to determine the number of days in a month with javascript?
+// https://stackoverflow.com/questions/315760/what-is-the-best-way-to-determine-the-number-of-days-in-a-month-with-javascript
+// Flyswat's answer:
+// NOTE: Unlike Date.getMonth()'s range [0,11], this function expects its month arg range to be [1,12]
+function daysInMonth(year, month) {
+    // This works by creating a Date object with the current object's year,
+    // and the month *after* the month you actually want the number of days for.
+    // The "0" for the day-of-month value effectively means "get the last day of the prior month",
+    // which is the current month because of the +1 offset in the args.
+    return new Date(year, month, 0).getDate();
+};
+
+var nowDate = new Date();
+var decDoy = nowDate.getDOY();
+var binDoy = dec2binString(decDoy);
+
+// Build the "Current Date Banner"
+var divDateZone = document.getElementById("divDateZone");
+var yr = nowDate.getFullYear();
+var mn = nowDate.getMonth() + 1;
+var dy= nowDate.getDate();  // unintuitively returns day of month range [1,31]
+var dateText = 'TODAY IS [' + yr + '-' + mn + '-' + dy + '] [' + decDoy + '] [' + binDoy + ']';
+divDateZone.appendChild(document.createTextNode(dateText));
+
+// Build the Calendar as a dynamically-generated HTML table
+var divCalendarZone = document.getElementById("divCalendarZone");
+
+var elCalendar = document.createElement('table');
+elCalendar.id = "tableCalendar";
+
+var elCalendarBody = document.createElement('tbody');
+elCalendarBody.id = "tbodyCalendar";
+elCalendar.appendChild(elCalendarBody);
+
+var monthCount = 12;
+var maxMonthDayCount = 31;
+var monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+var jDay = 1;
+for (var iMonth = 0; iMonth < monthCount; iMonth++) {
+    var elRow = document.createElement('tr');
+    elRow.id = 'tr' + iMonth.toString();
+    elCalendarBody.appendChild(elRow);
+    for (var iDay = 0; iDay < maxMonthDayCount + 1; iDay++) {
+        var elCell = document.createElement('td');
+        if (iDay == 0) {
+            // First column of the table is a "row header" with abreviated month name.
+            elCell.id = 'td_' + monthNames[iMonth];
+            elCell.appendChild(document.createTextNode(monthNames[iMonth]));
+        } else {
+            elCell.id = jDay.toString();
+            var cellText = "";
+            if (iDay <= daysInMonth(nowDate.getFullYear(), (iMonth+1))) {
+                if (jDay == decDoy) {
+                    elCell.style.backgroundColor = "#7FFFD4"; // css Aquamarine
+                }
+                cellText = jDay.toString();
+                jDay++;
+            }
+            elCell.appendChild(document.createTextNode(cellText));
+        }
+        elRow.appendChild(elCell)
+    }
+}
+divCalendarZone.appendChild(elCalendar);
+</script>
+
+</body>
+</html>
