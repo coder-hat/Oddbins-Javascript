@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="rps.js"></script>
+        <h2>Rock Paper Scissors Cellular Automata</h2>
+        <p>
+            Andrew M. Webb
+            <a href="https://twitter.com/AndrewM_Webb/status/1236274167437197320">tweeted this idea</a>
+            (and a running example) on Twitter.
+            <br>
+            I thought it would be a nice way to learn some Javascript.
+        </p>
+    </head>
+    <body>
+        <canvas id="myCanvas" width="10" height="10" style="border:1px solid #d3d3d3;">
+            Your browser does not support the HTML canvas tag.
+        </canvas>
+    </body>
+    <script>
+        const CELL_SIZE_PIXELS = 3;
+        const GRID_CELL_WIDE = 250;
+        const GRID_CELL_HIGH = 200;
+        const GRID_CENTER_X = GRID_CELL_WIDE / 2;
+        const GRID_CENTER_Y = GRID_CELL_HIGH / 2;
+
+        var canvas = document.getElementById("myCanvas");
+        var context = canvas.getContext("2d");
+    
+        var currentGrid = makeGrid(GRID_CELL_HIGH, GRID_CELL_WIDE);
+
+        canvas.width = GRID_CELL_WIDE * CELL_SIZE_PIXELS;
+        canvas.height = GRID_CELL_HIGH * CELL_SIZE_PIXELS;
+
+        function update() {
+            // STUB
+        }
+
+        function draw() {
+            drawGrid(context, currentGrid, GRID_CELL_HIGH, GRID_CELL_WIDE, CELL_SIZE_PIXELS);
+        }
+
+        function frame(timeStamp) {
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            update();
+            draw();
+            // window.requestAnimationFrame(frame);
+        }
+
+        window.requestAnimationFrame(frame);
+    </script>
+</html>
