@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Rock Paper Scissors Cellular Automata</title>
         <script src="rps.js"></script>
         <h2>Rock Paper Scissors Cellular Automata</h2>
         <p>
@@ -12,6 +13,7 @@
         </p>
     </head>
     <body>
+        <div id="censusDiv" style="background-color: orange"></div>
         <canvas id="myCanvas" width="10" height="10" style="border:1px solid #d3d3d3;">
             Your browser does not support the HTML canvas tag.
         </canvas>
@@ -31,8 +33,12 @@
         canvas.width = GRID_CELL_WIDE * CELL_SIZE_PIXELS;
         canvas.height = GRID_CELL_HIGH * CELL_SIZE_PIXELS;
 
+        censusDiv = document.getElementById("censusDiv");
+
         function update() {
-            // STUB
+            var updatedGrid = nextGrid(currentGrid, GRID_CELL_WIDE, GRID_CELL_HIGH);
+            censusDiv.innerText = censusInnerHtml(cellCensus(updatedGrid));
+            currentGrid = updatedGrid;
         }
 
         function draw() {
@@ -43,7 +49,7 @@
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
             update();
             draw();
-            // window.requestAnimationFrame(frame);
+            window.requestAnimationFrame(frame);
         }
 
         window.requestAnimationFrame(frame);
