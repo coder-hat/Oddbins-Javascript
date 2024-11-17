@@ -13,10 +13,16 @@
         </p>
     </head>
     <body>
-        <div id="censusDiv" style="background-color: orange"></div>
-        <canvas id="myCanvas" width="10" height="10" style="border:1px solid #d3d3d3;">
-            Your browser does not support the HTML canvas tag.
-        </canvas>
+        <div id="mainPanel" style="max-width: 750px;">
+            <p>
+            <button id="btnStart" onclick="javascript:start();">START</button>
+            <button id="btnStop" onclick="javascript:stop();" disabled="true">STOP</button>
+            </p>
+            <div id="censusDiv" style="background-color: orange;">(Click Start)</div>
+            <canvas id="myCanvas" width="10" height="10" style="border:1px solid #d3d3d3;">
+                Your browser does not support the HTML canvas tag.
+            </canvas>
+        </div>
     </body>
     <script>
         const CELL_SIZE_PIXELS = 3;
@@ -35,6 +41,14 @@
 
         censusDiv = document.getElementById("censusDiv");
 
+        function disableButton(elButton) {
+            elButton.setAttribute("disabled", "true");
+        }
+
+        function enableButton(elButton) {
+            elButton.removeAttribute("disabled");
+        }
+
         function update() {
             var updatedGrid = nextGrid(currentGrid, GRID_CELL_WIDE, GRID_CELL_HIGH);
             censusDiv.innerText = censusInnerHtml(cellCensus(updatedGrid));
@@ -49,9 +63,32 @@
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
             update();
             draw();
-            window.requestAnimationFrame(frame);
+            requestId = window.requestAnimationFrame(frame);
         }
 
-        window.requestAnimationFrame(frame);
+        // NOTE 2024-11-16
+        // The following idiom is based this Stack Overflow item:
+        // How to stop a requestAnimationFrame recursion/loop?
+        // https://stackoverflow.com/questions/10735922/how-to-stop-a-requestanimationframe-recursion-loop
+
+        var requestId = undefined;
+
+        function start() {
+            disableButton(document.getElementById("btnStart"));
+            if (!requestId) {
+                requestId = window.requestAnimationFrame(frame);
+            }
+            enableButton(document.getElementById("btnStop"));
+        }
+
+        function stop() {
+            disableButton(document.getElementById("btnStop"));
+            if (requestId) {
+                window.cancelAnimationFrame(requestId);
+                requestId = undefined;
+            }
+            enableButton(document.getElementById("btnStart"));
+        }
+
     </script>
 </html>
